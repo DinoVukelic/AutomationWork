@@ -5,7 +5,7 @@ Sub CheckParticipantsByDateOnly()
     Dim lastRow As Long
     lastRow = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row ' Finds the last row in Column A
     
-    ' Adjust the array of participants as needed
+    ' Define the list of participants
     Dim participants As Variant
     participants = Array("ESB - ESBIE NI", "ESB - ESBIE", "ESB – Coolkeeragh", "ESB - Customer Supply", "ESB – PGEN", "ESB – Synergen")
     
@@ -43,7 +43,7 @@ Sub CheckParticipantsByDateOnly()
         For Each participantKey In dateParticipantsDict(dateKey).keys
             If dateParticipantsDict(dateKey)(participantKey) = False Then
                 allDatesCovered = False
-                missingParticipants = missingParticipants & "Participant " & participantKey & " is missing for date " & Format(dateKey, "mm/dd/yyyy") & "." & vbCrLf
+                missingParticipants = missingParticipants & "Participant " & participantKey & " is missing for date " & Format(dateKey, "dd/mm/yyyy") & "." & vbCrLf
             End If
         Next participantKey
     Next dateKey
