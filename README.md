@@ -7,7 +7,7 @@ Sub CheckParticipantsByDateOnly()
     
     ' Define the list of participants
     Dim participants As Variant
-    participants = Array("ESB - ESBIE NI", "ESB - ESBIE", "ESB – Coolkeeragh", "ESB - Customer Supply", "ESB – PGEN", "ESB – Synergen")
+    participants = Array("ESB - ESBIE NI", "ESB - ESBIE", "ESB - Coolkeeragh", "ESB - Customer Supply", "ESB - PGEN", "ESB - Synergen")
     
     Dim dateParticipantsDict As Object
     Set dateParticipantsDict = CreateObject("Scripting.Dictionary")
@@ -15,7 +15,10 @@ Sub CheckParticipantsByDateOnly()
     Dim i As Long
     For i = 2 To lastRow ' Assuming Row 1 has headers
         Dim currentDate As Date
-        currentDate = Int(CDate(ws.Cells(i, "A").Value)) ' Get the start date, removing time
+        currentDate = Int(CDate(Trim(ws.Cells(i, "A").Value))) ' Get the start date, removing time and any spaces
+        
+        ' Format the date as per the system's short date format
+        currentDate = Format(currentDate, "dd/mm/yyyy")
         
         If Not dateParticipantsDict.exists(currentDate) Then
             dateParticipantsDict.Add currentDate, CreateObject("Scripting.Dictionary")
@@ -26,10 +29,14 @@ Sub CheckParticipantsByDateOnly()
         End If
         
         Dim currentParticipant As String
-        currentParticipant = ws.Cells(i, "E").Value ' Get the participant
+        ' Trim the participant name to ensure no leading/trailing spaces
+        currentParticipant = Trim(ws.Cells(i, "E").Value)
         
-        If dateParticipantsDict(currentDate).exists(currentParticipant) Then
-            dateParticipantsDict(currentDate)(currentParticipant) = True
+        ' Correct any potential case sensitivity issues
+        currentParticipant = UCase(currentParticipant)
+        
+        If dateParticipantsDict(currentDate).exists(UCase(currentParticipant)) Then
+            dateParticipantsDict(currentDate)(UCase(currentParticipant)) = True
         End If
     Next i
     
@@ -43,7 +50,7 @@ Sub CheckParticipantsByDateOnly()
         For Each participantKey In dateParticipantsDict(dateKey).keys
             If dateParticipantsDict(dateKey)(participantKey) = False Then
                 allDatesCovered = False
-                missingParticipants = missingParticipants & "Participant " & participantKey & " is missing for date " & Format(dateKey, "dd/mm/yyyy") & "." & vbCrLf
+                missingParticipants = missingParticipants & "Participant " & participantKey & " is missing for date " & dateKey & "." & vbCrLf
             End If
         Next participantKey
     Next dateKey
