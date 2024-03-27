@@ -5,20 +5,22 @@ Sub CheckParticipantsByDateOnly()
     Dim lastRow As Long
     lastRow = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row ' Finds the last row in Column A
     
-    ' Define the list of participants
+    ' Define the list of participants with trimmed spaces and standardized hyphens
     Dim participants As Variant
-    participants = Array("ESB - ESBIE NI", "ESB - ESBIE", "ESB - Coolkeeragh", "ESB - Customer Supply", "ESB - PGEN", "ESB - Synergen")
+    participants = Array("ESB - ESBIE NI", "ESB - ESBIE", "ESB – Coolkeeragh", "ESB - Customer Supply", "ESB – PGEN", "ESB – Synergen")
+    Dim j As Integer
+    For j = LBound(participants) To UBound(participants)
+        ' Replace any en-dash or em-dash with a standard hyphen-minus and trim spaces
+        participants(j) = Trim(Replace(Replace(participants(j), ChrW(8211), "-"), ChrW(8212), "-"))
+    Next j
     
     Dim dateParticipantsDict As Object
     Set dateParticipantsDict = CreateObject("Scripting.Dictionary")
     
     Dim i As Long
     For i = 2 To lastRow ' Assuming Row 1 has headers
-        Dim currentDate As Date
-        currentDate = Int(CDate(Trim(ws.Cells(i, "A").Value))) ' Get the start date, removing time and any spaces
-        
-        ' Format the date as per the system's short date format
-        currentDate = Format(currentDate, "dd/mm/yyyy")
+        Dim currentDate As String
+        currentDate = Format(ws.Cells(i, "A").Value, "dd/mm/yyyy") ' Ensure the date format is consistent
         
         If Not dateParticipantsDict.exists(currentDate) Then
             dateParticipantsDict.Add currentDate, CreateObject("Scripting.Dictionary")
@@ -29,15 +31,18 @@ Sub CheckParticipantsByDateOnly()
         End If
         
         Dim currentParticipant As String
-        ' Trim the participant name to ensure no leading/trailing spaces
-        currentParticipant = Trim(ws.Cells(i, "E").Value)
+        currentParticipant = Trim(ws.Cells(i, "E").Value) ' Get the participant and trim spaces
         
-        ' Correct any potential case sensitivity issues
-        currentParticipant = UCase(currentParticipant)
+        ' Standardize hyphens in participant name to avoid mismatch due to different hyphen characters
+        currentParticipant = Replace(Replace(currentParticipant, ChrW(8211), "-"), ChrW(8212), "-")
         
-        If dateParticipantsDict(currentDate).exists(UCase(currentParticipant)) Then
-            dateParticipantsDict(currentDate)(UCase(currentParticipant)) = True
-        End If
+        Dim partKey As Variant
+        For Each partKey In dateParticipantsDict(currentDate).keys
+            If UCase(currentParticipant) = UCase(partKey) Then
+                dateParticipantsDict(currentDate)(partKey) = True
+                Exit For
+            End If
+        Next partKey
     Next i
     
     Dim missingParticipants As String
