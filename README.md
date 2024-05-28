@@ -36,13 +36,9 @@ Sub CheckParticipantsByDateOnly()
         ' Standardize hyphens in participant name to avoid mismatch due to different hyphen characters
         currentParticipant = Replace(Replace(currentParticipant, ChrW(8211), "-"), ChrW(8212), "-")
 
-        Dim partKey As Variant
-        For Each partKey In dateParticipantsDict(currentDate).keys
-            If UCase(currentParticipant) = UCase(partKey) Then
-                dateParticipantsDict(currentDate)(partKey) = True
-                Exit For
-            End If
-        Next partKey
+        If dateParticipantsDict(currentDate).exists(currentParticipant) Then
+            dateParticipantsDict(currentDate)(currentParticipant) = True
+        End If
     Next i
 
     Dim missingParticipants As String
