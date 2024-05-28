@@ -5,12 +5,12 @@ Sub CheckParticipantsByDateOnly()
     Dim lastRow As Long
     lastRow = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row ' Finds the last row in Column A
 
-    ' Define the list of participants
+    ' Define the list of participants with trimmed spaces and standardized hyphens
     Dim participants As Variant
     participants = Array("ESB - ESBIE NI", "ESB - ESBIE", "ESB - Coolkeeragh", "ESB - Customer Supply", "ESB - PGEN", "ESB - Synergen")
     Dim j As Integer
     For j = LBound(participants) To UBound(participants)
-        ' Standardize the participant names by replacing different dash characters with standard hyphen
+        ' Replace any en-dash or em-dash with a standard hyphen-minus and trim spaces
         participants(j) = Trim(Replace(Replace(participants(j), ChrW(8211), "-"), ChrW(8212), "-"))
     Next j
 
@@ -20,7 +20,7 @@ Sub CheckParticipantsByDateOnly()
     Dim i As Long
     For i = 2 To lastRow ' Assuming Row 1 has headers
         Dim currentDate As String
-        currentDate = Format(ws.Cells(i, "A").Value, "dd/mm/yyyy") ' Formatting the date
+        currentDate = Format(ws.Cells(i, "A").Value, "dd/mm/yyyy") ' Ensure the date format is consistent
 
         ' Add date if it doesn't exist
         If Not dateParticipantsDict.exists(currentDate) Then
@@ -49,19 +49,23 @@ Sub CheckParticipantsByDateOnly()
     ' Check each date for missing participants
     Dim dateKey As Variant
     For Each dateKey In dateParticipantsDict.keys
-        Dim missingForDate As String
-        missingForDate = ""
+        Dim isDateMissing As Boolean
+        isDateMissing = False
+        Dim participantList As String
+        participantList = ""
+
         Dim participantKey As Variant
         For Each participantKey In dateParticipantsDict(dateKey).keys
-            If Not dateParticipantsDict(dateKey)(participantKey) Then
+            If dateParticipantsDict(dateKey)(participantKey) = False Then
                 allDatesCovered = False
-                missingForDate = missingForDate & "Participant " & participantKey & vbCrLf
+                isDateMissing = True
+                participantList = participantList & "Participant " & participantKey & vbCrLf
             End If
         Next participantKey
-        
+
         ' Add only if there are missing participants for this date
-        If Len(missingForDate) > 0 Then
-            missingParticipants = missingParticipants & "Date: " & dateKey & vbCrLf & missingForDate & vbCrLf
+        If isDateMissing Then
+            missingParticipants = missingParticipants & "Date: " & dateKey & vbCrLf & participantList & vbCrLf
         End If
     Next dateKey
 
