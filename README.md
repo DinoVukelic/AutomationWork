@@ -7,7 +7,7 @@ Sub CheckParticipantsByDateOnly()
 
     ' Define the list of participants with trimmed spaces and standardized hyphens
     Dim participants As Variant
-    participants = Array("ESB - ESBIE NI", "ESB - ESBIE", "ESB – Coolkeeragh", "ESB - Customer Supply", "ESB – PGEN", "ESB – Synergen")
+    participants = Array("ESB - ESBIE NI", "ESB - ESBIE", "ESB - Coolkeeragh", "ESB - Customer Supply", "ESB - PGEN", "ESB - Synergen")
     Dim j As Integer
     For j = LBound(participants) To UBound(participants)
         ' Replace any en-dash or em-dash with a standard hyphen-minus and trim spaces
