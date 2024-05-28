@@ -5,12 +5,12 @@ Sub CheckParticipantsByDateOnly()
     Dim lastRow As Long
     lastRow = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row ' Finds the last row in Column A
 
-    ' Define the list of participants with trimmed spaces and standardized hyphens
+    ' Define the list of participants
     Dim participants As Variant
     participants = Array("ESB - ESBIE NI", "ESB - ESBIE", "ESB - Coolkeeragh", "ESB - Customer Supply", "ESB - PGEN", "ESB - Synergen")
     Dim j As Integer
     For j = LBound(participants) To UBound(participants)
-        ' Replace any en-dash or em-dash with a standard hyphen-minus and trim spaces
+        ' Standardize the participant names by replacing different dash characters with standard hyphen
         participants(j) = Trim(Replace(Replace(participants(j), ChrW(8211), "-"), ChrW(8212), "-"))
     Next j
 
@@ -20,7 +20,7 @@ Sub CheckParticipantsByDateOnly()
     Dim i As Long
     For i = 2 To lastRow ' Assuming Row 1 has headers
         Dim currentDate As String
-        currentDate = Format(ws.Cells(i, "A").Value, "dd/mm/yyyy") ' Ensure the date format is consistent
+        currentDate = Format(ws.Cells(i, "A").Value, "dd/mm/yyyy") ' Formatting the date
 
         ' Add date if it doesn't exist
         If Not dateParticipantsDict.exists(currentDate) Then
