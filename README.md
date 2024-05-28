@@ -53,15 +53,15 @@ Sub CheckParticipantsByDateOnly()
         missingForDate = ""
         Dim participantKey As Variant
         For Each participantKey In dateParticipantsDict(dateKey).keys
-            If dateParticipantsDict(dateKey)(participantKey) = False Then
+            If Not dateParticipantsDict(dateKey)(participantKey) Then
                 allDatesCovered = False
                 missingForDate = missingForDate & "Participant " & participantKey & vbCrLf
             End If
         Next participantKey
         
         ' Add only if there are missing participants for this date
-        If missingForDate <> "" Then
-            missingParticipants = missingParticipants & "Date: " & dateKey & vbCrLf & missingForDate
+        If Len(missingForDate) > 0 Then
+            missingParticipants = missingParticipants & "Date: " & dateKey & vbCrLf & missingForDate & vbCrLf
         End If
     Next dateKey
 
